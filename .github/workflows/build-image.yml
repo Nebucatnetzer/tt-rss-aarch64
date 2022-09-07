@@ -27,4 +27,6 @@ jobs:
     - name: Build image
       run:  docker-compose build
       working-directory: ttrss-docker-compose/
+      env:
+        HTTP_PORT: 8080
 
