@@ -21,16 +21,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Clone ttrss-docker-compose repository
-      run: git clone https://git.tt-rss.org/fox/ttrss-docker-compose.git
-      
     - name: Install dependencies
       run: sudo apt-get install -y qemu binfmt-support qemu-user-static
       
-    - name: Some docker thing
+    - name: Enable multiarch in Docker
       run: docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-      
+    
+    - name: Clone ttrss-docker-compose repository
+      run: git clone -b static-dockerhub https://git.tt-rss.org/fox/ttrss-docker-compose.git
+         
     - name: Build image
       run:  docker buildx build --platform linux/arm64 .
-      working-directory: ttrss-docker-compose/app
+      working-directory: ttrss-docker-compose/src/app
 
