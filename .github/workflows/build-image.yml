@@ -22,8 +22,5 @@ jobs:
 
     steps:
     - name: Clone ttrss-docker-compose repository
-      uses: actions/checkout@v2
-      with:
-        repository: https://git.tt-rss.org/fox/ttrss-docker-compose.git
-        path: ttrss-docker-compose
-        ref: static-dockerhub
+      run: git clone -b static-dockerhub https://git.tt-rss.org/fox/ttrss-docker-compose.git
+
