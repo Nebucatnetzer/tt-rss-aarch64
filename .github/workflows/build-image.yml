@@ -25,6 +25,6 @@ jobs:
       run: git clone https://git.tt-rss.org/fox/ttrss-docker-compose.git
       
     - name: Build image
-      run:  docker buildx build --platform linux/arm64
+      run:  docker buildx build --platform linux/arm64 .
       working-directory: ttrss-docker-compose/app
 
