@@ -22,8 +22,9 @@ jobs:
 
     steps:
     - name: Clone ttrss-docker-compose repository
-      run: git clone -b static-dockerhub https://git.tt-rss.org/fox/ttrss-docker-compose.git
+      run: git clone https://git.tt-rss.org/fox/ttrss-docker-compose.git
       
     - name: Build image
-      run: docker buildx build --platform linux/arm64 ttrss-docker-compose/src/app
+      run:  docker-compose build
+      working-directory: ttrss-docker-compose/
 
