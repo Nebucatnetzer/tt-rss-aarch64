@@ -25,7 +25,7 @@ jobs:
       run: git clone https://git.tt-rss.org/fox/ttrss-docker-compose.git
       
     - name: Install dependencies
-      run: apt-get install -y qemu binfmt-support qemu-user-static
+      run: sudo apt-get install -y qemu binfmt-support qemu-user-static
       
     - name: Some docker thing
       run: docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
