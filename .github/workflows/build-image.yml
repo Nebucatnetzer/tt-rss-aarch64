@@ -13,8 +13,6 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-env:
-  IMAGE_NAME: tt-rss-aarch64
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -32,15 +30,17 @@ jobs:
     
     - name: Clone ttrss-docker-compose repository
       run: git clone -b static-dockerhub https://git.tt-rss.org/fox/ttrss-docker-compose.git
-         
-    - name: Build image
-      run:  docker buildx build --tag $IMAGE_NAME --platform linux/arm64 .
-      working-directory: ttrss-docker-compose/src/app
 
     - name: Log into registry
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-    - name: Push image
+    - name: Build image $IMAGE_NAME
+      run:  docker buildx build --tag $IMAGE_NAME --platform linux/arm64 .
+      working-directory: ttrss-docker-compose/src/app
+      env:
+        IMAGE_NAME: ttrss-fpm-pgsql-static
+        
+    - name: Push image $IMAGE_NAME
       run: |
         IMAGE_ID=ghcr.io/${{ github.repository }}/$IMAGE_NAME
         # Change all uppercase to lowercase
@@ -55,3 +55,29 @@ jobs:
         echo VERSION=$VERSION
         docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
         docker push $IMAGE_ID:$VERSION
+      env:
+        IMAGE_NAME: ttrss-fpm-pgsql-static
+        
+    - name: Build image $IMAGE_NAME
+      run:  docker buildx build --tag $IMAGE_NAME --platform linux/arm64 .
+      working-directory: ttrss-docker-compose/src/web-nginx
+      env:
+        IMAGE_NAME: ttrss-web-nginx
+        
+    - name: Push image $IMAGE_NAME
+      run: |
+        IMAGE_ID=ghcr.io/${{ github.repository }}/$IMAGE_NAME
+        # Change all uppercase to lowercase
+        IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+        # Strip git ref prefix from version
+        VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+        # Strip "v" prefix from tag name
+        [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+        # Use Docker `latest` tag convention
+        [ "$VERSION" == "main" ] && VERSION=latest
+        echo IMAGE_ID=$IMAGE_ID
+        echo VERSION=$VERSION
+        docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
+        docker push $IMAGE_ID:$VERSION
+      env:
+        IMAGE_NAME: ttrss-web-nginx
